@@ -28,11 +28,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
 
-    final String language = "en";
-    final String word = "ace";
-    final String word_id = word.toLowerCase();
-    final String app_id = "5139d66d";
-    final String app_key = "52e133083f70d7608e4c07b78e200c3e";
+
 
 
     @Override
@@ -41,63 +37,126 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
+        final String language = "en";
+        final String word = binding.editTextTextPersonName.getText().toString();
+        final String fields = "definitions";
+        final String strictMatch = "false";
+        final String word_id = word.toLowerCase();
+        final String app_id = "5139d66d";
+        final String app_key = "52e133083f70d7608e4c07b78e200c3e";
+
         binding.click.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 // Instantiate the RequestQueue.
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                String url = "https://od-api.oxforddictionaries.com:443/api/v2/entries/" + language + "/" + word_id;
+                String url = "https://od-api.oxforddictionaries.com:443/api/v2/entries/";
 
+//
+//                JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+//                    @Override
+//                    public void onResponse(JSONArray response) {
+//                        try {
+//
+//
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//
+//                    }}){
+//
+//                @Override
+//                public Map<String, String> getHeaders() throws AuthFailureError {
+//                    Map<String, String>  params = new HashMap<String, String>();
+//                    params.put("app_id", app_id);
+//                    params.put("app_key", app_key);
+//
+//                    return params;
+//                }
+//            };
+//
+//                queue.add(jsonArrayRequest);
+//
+//
+//            }
+//        });
+//        setContentView(binding.getRoot());
+//    }
 
-               JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    JSONObject jsonObject = response.getJSONObject("ace");
-                                   // Toast.makeText(MainActivity.this, jsonObject.toString(), Toast.LENGTH_SHORT).show();
+    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    // Display the first 500 characters of the response string.
+                    try {
+                        JSONObject responseJSON = new JSONObject(response);
+                        JSONArray results = responseJSON.getJSONArray("results");
 
+                        String a =  results.getJSONObject(0).toString();
+                        JSONArray lexicalEntries =responseJSON.getJSONArray("lexicalEntries");
+                        JSONArray entriesArr = lexicalEntries.getJSONObject(0).getJSONArray("entries");
+                        JSONArray sensesArr = entriesArr.getJSONObject(0).getJSONArray("senses");
+                        JSONArray definitionArr = sensesArr.getJSONObject(0).getJSONArray("definitions");
 
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                binding.editTextTextPersonName.setText(response.toString());
-
-                            }
-                        }, new Response.ErrorListener(){
-
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                        String def = definitionArr.toString();
+                        binding.text.setText(def);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }){
+                }
+            }, new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
 
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String>  params = new HashMap<String, String>();
-                        params.put("app_id", app_id);
-                        params.put("app_key", app_key);
+            Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
 
-                        return params;
-                    }
+        }
+    }){
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String>  params = new HashMap<String, String>();
+                    params.put("app_id", app_id);
+                    params.put("app_key", app_key);
+
+                    return params;
+                }
+            };
+
+                queue.add(stringRequest);
 
 
-                };
-                // Request a string response from the provided URL.
-//                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-//                        new Response.Listener<String>() {
+            }
+        });
+        setContentView(binding.getRoot());
+            };
+
+//               JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null,
+//                        new Response.Listener<JSONObject>() {
 //                            @Override
-//                            public void onResponse(String response) {
-//                                Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
+//                            public void onResponse(JSONObject response) {
+//
+//                                 JSONArray e = response.getJSONArray("entries");
+//
+//
+//                                   // Toast.makeText(MainActivity.this, jsonObject.toString(), Toast.LENGTH_SHORT).show();
+//
+//
+//
 //                            }
-//                        }, new Response.ErrorListener() {
+//                        }, new Response.ErrorListener(){
+//
+//
 //                    @Override
 //                    public void onErrorResponse(VolleyError error) {
 //                        Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-//                   }
-//              }){
+//                    }
+//                }){
 //
 //                    @Override
 //                    public Map<String, String> getHeaders() throws AuthFailureError {
@@ -107,14 +166,9 @@ public class MainActivity extends AppCompatActivity {
 //
 //                        return params;
 //                    }
+//
+//
 //                };
 
-                // Add the request to the RequestQueue.
-                queue.add(request);
 
-
-            }
-        });
-        setContentView(binding.getRoot());
-    }
 }
