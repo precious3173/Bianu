@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         final String language = "en";
-        final String word = binding.editTextTextPersonName.getText().toString();
+        final String word = binding.editTextTextPersonName.getText().toString().toLowerCase();
         final String fields = "definitions";
         final String strictMatch = "false";
         final String word_id = word.toLowerCase();
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Instantiate the RequestQueue.
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                String url = "https://od-api.oxforddictionaries.com:443/api/v2/entries/";
+                String url = "https://od-api.oxforddictionaries.com/api/v1/entries/en/"+ word;
 
 //
 //                JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
